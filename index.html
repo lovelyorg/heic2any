@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HEIC to jpeg/png/....</title>
+  </head>
+  <body>
+    <input
+      type="file"
+      onchange="changeHandler(event)"
+      style="display: block;"
+    />
+    <div id="errormsg"></div>
+    <img id="img" style="max-width: 1000px;" />
+  </body>
+  <script src="./node_modules/heic2any/dist/heic2any.js"></script>
+  <script>
+    function changeHandler(ev) {
+      img.src = "";
+      errormsg.innerHTML = "";
+      errormsg.style.display = "none";
+      var blob = ev.target.files[0];
+      heic2any({
+        blob: blob,
+        toType: "image/jpeg",
+      })
+        .then(function (resultBlob) {
+          console.log(resultBlob);
+          fileOrBlobToDataURL(resultBlob, (m) => {
+            img.src = m.target.result;
+            console.log(m);
+          });
+        })
+        .catch(function (x) {
+          errormsg.style.display = "block";
+          errormsg.innerHTML =
+            "Error code: <code>" + x.code + "</code> " + x.message;
+        });
+    }
+
+    function fileOrBlobToDataURL(obj, cb) {
+      var a = new FileReader();
+      a.readAsDataURL(obj);
+      a.onload = cb;
+    }
+  </script>
+</html>
